@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: دریافت پروژه
+      - name: دریافت فایل‌ها
         uses: actions/checkout@v4
 
       - name: نصب Java 17
@@ -25,17 +25,20 @@ jobs:
         with:
           packages: 'platforms;android-35 build-tools;35.0.0 platform-tools'
 
-      - name: نصب Gradle 8.9
-        uses: gradle/actions/setup-gradle@v6
-        with:
-          gradle-version: '8.9'
+      - name: استخراج پروژه Android
+        run: |
+          mkdir android-project
+          unzip -q *.zip -d android-project
 
       - name: ساخت APK
-        run: gradle --no-daemon assembleDebug
+        working-directory: android-project
+        run: |
+          chmod +x gradlew
+          gradle --no-daemon assembleDebug
 
-      - name: آماده‌سازی فایل APK
+      - name: ذخیره APK
         uses: actions/upload-artifact@v4
         with:
           name: Noshirvani413-APK
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: android-project/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
